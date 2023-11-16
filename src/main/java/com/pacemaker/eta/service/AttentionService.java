@@ -11,6 +11,7 @@ import dto.response.RecordResponseDto;
 import dto.response.StatusResponseDto;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.EntityNotFoundException;
@@ -29,7 +30,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AttentionService {
+
     private static final String ATTENTION_MODEL_URL = "http://eta-model.kro.kr:5000/api/v1/eta/attention";
+    private static final int ATTENTION_STATUS = 1;
+    private static final int DISTRACTION_STATUS = 0;
 
     private final AttentionJpaRepository attentionJpaRepository;
     private final StatusJpaRepository statusJpaRepository;
@@ -57,7 +61,9 @@ public class AttentionService {
         int distractionCount = attentionOrNot[0];
         int attentionCount = attentionOrNot[1];
 
-        return new RecordResponseDto(interval, distractionCount, attentionCount);
+        List<LocalDateTime> attentionTimeList = getAttentionTimeList(attentionId);
+
+        return new RecordResponseDto(interval, distractionCount, attentionCount, attentionTimeList);
     }
 
     private Duration getTotalTime(LocalDateTime startAt, LocalDateTime stopAt) {
@@ -86,11 +92,11 @@ public class AttentionService {
     private int getPrediction(String responseBody) {
         int prediction;
         if(responseBody.contains("0")) {
-            prediction = 0;
+            prediction = DISTRACTION_STATUS;
             return prediction;
         }
         if (responseBody.contains("1")) {
-            prediction = 1;
+            prediction = ATTENTION_STATUS;
             return prediction;
         }
         return -1;
@@ -128,6 +134,17 @@ public class AttentionService {
         objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
 
         return objectMapper.readValue(response.getBody(), StatusResponseDto.class);
+    }
+
+    private List<LocalDateTime> getAttentionTimeList(Long attentionId) {
+        List<LocalDateTime> attentionTimeList = new ArrayList<>();
+        List<Status> statusList = statusJpaRepository.findAllByAttention_attentionId(attentionId);
+        for (Status status : statusList) {
+            if (status.getCurrentStatus() == ATTENTION_STATUS) {
+                attentionTimeList.add(status.getCapturedAt());
+            }
+        }
+        return attentionTimeList;
     }
 
 }

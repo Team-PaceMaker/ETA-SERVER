@@ -29,7 +29,7 @@ public class AttentionController {
 
     @PostMapping
     public ResponseEntity<StatusResponseDto> getStatus(@RequestParam("image") MultipartFile file,
-        @RequestHeader Long attentionId) throws Exception {
+        @RequestParam Long attentionId) throws Exception {
         return ResponseEntity.ok(attentionService.getStatus(file, attentionId));
     }
 
