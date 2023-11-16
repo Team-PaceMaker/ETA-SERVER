@@ -15,16 +15,20 @@ public class RecordResponseDto {
     private String totalTime;
     private int distractionCount;
     private int attentionCount;
-    private List<LocalDateTime> attentionTimeList;
+    private String attentionTime;
 
-    public RecordResponseDto(Duration duration, int distractionCount, int attentionCount, List<LocalDateTime> attentionTimeList) {
+    public RecordResponseDto(Duration totalTime, int distractionCount, int attentionCount, Duration attentionTime) {
+        this.totalTime = formatTime(totalTime);
+        this.distractionCount = distractionCount;
+        this.attentionCount = attentionCount;
+        this.attentionTime = formatTime(attentionTime);
+    }
+
+    private String formatTime(Duration duration) {
         long hours = duration.toHours();
         long minutes = duration.minusHours(hours).toMinutes();
         long seconds = duration.minusHours(hours).minusMinutes(minutes).getSeconds();
 
-        this.totalTime = String.format("%02d:%02d:%02d", hours, minutes, seconds);
-        this.distractionCount = distractionCount;
-        this.attentionCount = attentionCount;
-        this.attentionTimeList = attentionTimeList;
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 }

@@ -62,8 +62,10 @@ public class AttentionService {
         int attentionCount = attentionOrNot[1];
 
         List<LocalDateTime> attentionTimeList = getAttentionTimeList(attentionId);
+        Duration attentionDuration = getAttentionTime(attentionTimeList);
 
-        return new RecordResponseDto(interval, distractionCount, attentionCount, attentionTimeList);
+
+        return new RecordResponseDto(interval, distractionCount, attentionCount, attentionDuration);
     }
 
     private Duration getTotalTime(LocalDateTime startAt, LocalDateTime stopAt) {
@@ -145,6 +147,11 @@ public class AttentionService {
             }
         }
         return attentionTimeList;
+    }
+
+    private Duration getAttentionTime(List<LocalDateTime> attentionList) {
+        long totalSeconds =attentionList.size();
+        return Duration.ofSeconds(totalSeconds);
     }
 
 }
