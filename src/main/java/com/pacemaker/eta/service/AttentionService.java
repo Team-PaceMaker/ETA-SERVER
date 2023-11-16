@@ -6,7 +6,8 @@ import com.pacemaker.eta.domain.entity.Attention;
 import com.pacemaker.eta.domain.entity.Status;
 import com.pacemaker.eta.repository.AttentionJpaRepository;
 import com.pacemaker.eta.repository.StatusJpaRepository;
-import dto.AttentionResponseDto;
+import dto.response.AttentionOutResponseDto;
+import dto.response.StatusResponseDto;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import javax.persistence.EntityNotFoundException;
@@ -31,22 +32,22 @@ public class AttentionService {
     private final StatusJpaRepository statusJpaRepository;
 
     @Transactional
-    public String createAttention() {
+    public Long createAttention() {
         Attention attention = new Attention();
         attentionJpaRepository.save(attention);
-        return attention.getAttentionId().toString();
+        return attention.getAttentionId();
     }
 
     @Transactional
-    public String stopAttention(Long attentionId, LocalDateTime stopAt) {
+    public AttentionOutResponseDto stopAttention(Long attentionId, LocalDateTime stopAt) {
         Attention attention = attentionJpaRepository.findById(attentionId)
             .orElseThrow(() -> new EntityNotFoundException(("해당하는 집중 ID를 찾을 수 없습니다.")));
         attention.setStopAt(stopAt);
-        return attention.getStopAt().toString();
+        return AttentionOutResponseDto.of(attention);
     }
-    private void handlePrediction(String responseBody) {
+    private void handlePrediction(String responseBody, Long attentionId) {
         int prediction = getPrediction(responseBody);
-        createStatus(prediction);
+        createStatus(prediction, attentionId);
     }
 
     private int getPrediction(String responseBody) {
@@ -63,17 +64,19 @@ public class AttentionService {
     }
 
     @Transactional
-    public String createStatus(int prediction) {
-        // Long attentionId = attentionJpaRepository.
+    public String createStatus(int prediction,  Long attentionId) {
+        Attention attention = attentionJpaRepository.findById(attentionId)
+            .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 attention_id: " + attentionId));
         Status status = statusJpaRepository.save(Status.builder()
                 .currentStatus(prediction)
                 .capturedAt(LocalDateTime.now())
+                .attention(attention)
                 .build());
         return status.getStatusId().toString();
     }
 
     @Transactional
-    public AttentionResponseDto getStatus(MultipartFile file) throws Exception {
+    public StatusResponseDto getStatus(MultipartFile file, Long attentionId) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -86,12 +89,12 @@ public class AttentionService {
 
         HttpEntity<String> response = restTemplate.postForEntity(ATTENTION_MODEL_URL, requestMessage, String.class);
 
-        handlePrediction(Objects.requireNonNull(response.getBody()));
+        handlePrediction(Objects.requireNonNull(response.getBody()), attentionId);
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
 
-        return objectMapper.readValue(response.getBody(), AttentionResponseDto.class);
+        return objectMapper.readValue(response.getBody(), StatusResponseDto.class);
     }
 
 }

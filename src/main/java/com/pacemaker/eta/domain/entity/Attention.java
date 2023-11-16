@@ -25,7 +25,7 @@ public class Attention extends BaseTimeEntity {
     private LocalDateTime stopAt;
 
     @OneToMany(mappedBy = "attention", cascade = CascadeType.ALL)
-    private List<Status> attentions = new ArrayList<>();
+    private List<Status> statusList = new ArrayList<>();
     public void setStopAt(LocalDateTime stopAt) {
         this.stopAt = stopAt;
     }

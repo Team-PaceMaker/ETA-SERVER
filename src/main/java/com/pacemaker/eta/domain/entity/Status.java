@@ -41,8 +41,9 @@ public class Status extends BaseTimeEntity {
     private LocalDateTime capturedAt;
 
     @Builder
-    public Status(int currentStatus, LocalDateTime capturedAt) {
+    public Status(int currentStatus, LocalDateTime capturedAt, Attention attention) {
         this.currentStatus = currentStatus;
         this.capturedAt = capturedAt;
+        this.attention = attention;
     }
 }
