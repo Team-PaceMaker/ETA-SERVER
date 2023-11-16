@@ -1,0 +1,22 @@
+spring:
+  profiles:
+    include: SECRET-KEY
+
+  datasource:
+    url: jdbc:mysql://${database-host}/eta
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: admin
+    password: ${database-password}
+
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    properties:
+      hibernate:
+        ddl-auto: update
+        dialect: org.hibernate.dialect.MySQL5Dialect
+        format_sql: true
+    # generate-ddl: true
+
+server:
+  port: 8085
