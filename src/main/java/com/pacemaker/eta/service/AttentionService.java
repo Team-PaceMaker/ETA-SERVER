@@ -7,8 +7,11 @@ import com.pacemaker.eta.domain.entity.Status;
 import com.pacemaker.eta.repository.AttentionJpaRepository;
 import com.pacemaker.eta.repository.StatusJpaRepository;
 import dto.response.AttentionOutResponseDto;
+import dto.response.RecordResponseDto;
 import dto.response.StatusResponseDto;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +48,36 @@ public class AttentionService {
         attention.setStopAt(stopAt);
         return AttentionOutResponseDto.of(attention);
     }
+
+    public RecordResponseDto getRecord(Long attentionId) {
+        Attention attention = attentionJpaRepository.findById(attentionId)
+            .orElseThrow(() -> new EntityNotFoundException("해당하는 집중 ID를 찾을 수 없습니다."));
+        Duration interval = getTotalTime(attention.getCreatedAt(), attention.getStopAt());
+        int[] attentionOrNot = getStatusCount(attentionId);
+        int distractionCount = attentionOrNot[0];
+        int attentionCount = attentionOrNot[1];
+
+        return new RecordResponseDto(interval, distractionCount, attentionCount);
+    }
+
+    private Duration getTotalTime(LocalDateTime startAt, LocalDateTime stopAt) {
+        return Duration.between(startAt, stopAt);
+    }
+
+    private int[] getStatusCount(Long attentionId) {
+        List<Status> statusList = statusJpaRepository.findAllByAttention_attentionId(attentionId);
+        int distractionCount = 0;
+        int attentionCount = 0;
+        for (Status status : statusList) {
+            if (status.getCurrentStatus() == 1) {
+                attentionCount++;
+            } else {
+                distractionCount++;
+            }
+        }
+        return new int[]{distractionCount, attentionCount};
+    }
+
     private void handlePrediction(String responseBody, Long attentionId) {
         int prediction = getPrediction(responseBody);
         createStatus(prediction, attentionId);

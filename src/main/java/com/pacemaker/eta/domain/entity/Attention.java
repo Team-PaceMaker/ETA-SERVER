@@ -4,7 +4,6 @@ import com.pacemaker.eta.domain.global.BaseTimeEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,6 +27,10 @@ public class Attention extends BaseTimeEntity {
     private List<Status> statusList = new ArrayList<>();
     public void setStopAt(LocalDateTime stopAt) {
         this.stopAt = stopAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return super.getCreatedAt();
     }
 
 }
