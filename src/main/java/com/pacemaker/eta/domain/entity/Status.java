@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "status")
 @NoArgsConstructor
 @Getter
-public class Status extends BaseTimeEntity {
+public class Status {
 
     private static final int NOT_ATTENTION = 0;
 

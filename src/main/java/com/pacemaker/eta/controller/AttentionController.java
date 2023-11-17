@@ -60,4 +60,8 @@ public class AttentionController {
         return attentionService.getAttentionCount(attentionID);
     }
 
+    @GetMapping("/{attentionId}")
+    public StatusResponseDto getRecentStatus(@PathVariable("attentionId") Long attentionId) {
+        return attentionService.getFiveMinutesPrediction(attentionId);
+    }
 }

@@ -156,5 +156,32 @@ public class AttentionService {
         long totalSeconds = attentionList.size();
         return Duration.ofSeconds(totalSeconds);
     }
+    public StatusResponseDto getFiveMinutesPrediction(Long attentionId) {
+        int attentions = 0;
+        int distractions = 0;
+
+        List<Status> statusGroup = statusJpaRepository.findAllByAttention_attentionId(attentionId);
+        LocalDateTime currentTime = LocalDateTime.now();
+        LocalDateTime fiveMinutesAgo = currentTime.minusMinutes(5);
+        for (Status status : statusGroup) {
+            Duration interval = Duration.between(status.getCapturedAt(), currentTime);
+            LocalDateTime statusTime = status.getCapturedAt();
+            if (interval.getSeconds() <= 300 && statusTime.isAfter(fiveMinutesAgo)
+                && status.getCapturedAt()
+                .isBefore(currentTime)) {
+                if (status.getCurrentStatus() == 1) {
+                    attentions++;
+                } else {
+                    distractions++;
+                }
+            }
+        }
+
+        if (attentions >= distractions) {
+            return new StatusResponseDto(ATTENTION_STATUS);
+        } else {
+            return new StatusResponseDto(DISTRACTION_STATUS);
+        }
+    }
 
 }
