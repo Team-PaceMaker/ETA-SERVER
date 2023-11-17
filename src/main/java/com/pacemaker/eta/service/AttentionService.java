@@ -7,14 +7,24 @@ import com.pacemaker.eta.domain.entity.Status;
 import com.pacemaker.eta.repository.AttentionJpaRepository;
 import com.pacemaker.eta.repository.StatusJpaRepository;
 import dto.response.AttentionOutResponseDto;
+import dto.response.AttentionTimeSlotResponseDto;
 import dto.response.DonutChartResponseDto;
 import dto.response.RecordResponseDto;
 import dto.response.StatusResponseDto;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.OptionalLong;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -64,12 +74,18 @@ public class AttentionService {
     public RecordResponseDto getRecord(Long attentionId) {
         Attention attention = attentionJpaRepository.findById(attentionId)
             .orElseThrow(() -> new EntityNotFoundException("해당하는 집중 ID를 찾을 수 없습니다."));
+
+        if (attention.getStopAt() == null) {
+            throw new IllegalArgumentException("[Error] 종료되지 않은 attention입니다.");
+        }
         Duration interval = getTotalTime(attention.getCreatedAt(), attention.getStopAt());
 
         List<LocalDateTime> attentionTimeList = getAttentionTimeList(attentionId);
         Duration attentionDuration = getAttentionTime(attentionTimeList);
 
-        return new RecordResponseDto(interval, attentionDuration);
+        AttentionTimeSlotResponseDto timeSlots = getAttentionSlots(attentionTimeList);
+
+        return new RecordResponseDto(interval, attentionDuration, timeSlots);
     }
 
     private Duration getTotalTime(LocalDateTime startAt, LocalDateTime stopAt) {
@@ -145,7 +161,8 @@ public class AttentionService {
         List<LocalDateTime> attentionTimeList = new ArrayList<>();
         List<Status> statusList = statusJpaRepository.findAllByAttention_attentionId(attentionId);
         for (Status status : statusList) {
-            if (status.getCurrentStatus() == ATTENTION_STATUS) {
+            LocalDateTime capturedAt = status.getCapturedAt();
+            if (capturedAt != null && status.getCurrentStatus() == ATTENTION_STATUS) {
                 attentionTimeList.add(status.getCapturedAt());
             }
         }
@@ -156,6 +173,7 @@ public class AttentionService {
         long totalSeconds = attentionList.size();
         return Duration.ofSeconds(totalSeconds);
     }
+
     public StatusResponseDto getFiveMinutesPrediction(Long attentionId) {
         int attentions = 0;
         int distractions = 0;
@@ -182,6 +200,49 @@ public class AttentionService {
         } else {
             return new StatusResponseDto(DISTRACTION_STATUS);
         }
+    }
+
+    public AttentionTimeSlotResponseDto getAttentionSlots(List<LocalDateTime> attentionTimeList) {
+        if (attentionTimeList == null || attentionTimeList.isEmpty()) {
+            return new AttentionTimeSlotResponseDto(Collections.emptyList());
+        }
+
+        Map<Integer, Long> frequencyMap = attentionTimeList.stream()
+            .collect(Collectors.groupingBy(
+                LocalDateTime::getHour,
+                Collectors.counting()
+            ));
+
+        OptionalLong maxFrequency = frequencyMap.values().stream().mapToLong(v -> v).max();
+        List<String> resultSlots = new ArrayList<>();
+
+        if (maxFrequency.isPresent()) {
+            List<Integer> mostFrequentHours = frequencyMap.entrySet().stream()
+                .filter(entry -> entry.getValue() == maxFrequency.getAsLong())
+                .map(Map.Entry::getKey)
+                .sorted()
+                .toList();
+
+            int startHour = mostFrequentHours.get(0);
+            int endHour = startHour;
+
+            for (int i = 1; i < mostFrequentHours.size(); i++) {
+                if (mostFrequentHours.get(i) - endHour == 1) {
+                    endHour = mostFrequentHours.get(i);
+                } else {
+                    resultSlots.add(formatSlot(startHour, endHour));
+                    startHour = mostFrequentHours.get(i);
+                    endHour = startHour;
+                }
+            }
+            resultSlots.add(formatSlot(startHour, endHour));
+        }
+
+        return new AttentionTimeSlotResponseDto(resultSlots);
+    }
+
+    private String formatSlot(int startHour, int endHour) {
+        return startHour + "-" + (endHour+1);
     }
 
 }

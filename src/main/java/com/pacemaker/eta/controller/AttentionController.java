@@ -3,11 +3,13 @@ package com.pacemaker.eta.controller;
 import com.pacemaker.eta.service.AttentionService;
 import dto.response.AttentionOutResponseDto;
 import dto.response.AttentionResponseDto;
+import dto.response.AttentionTimeSlotResponseDto;
 import dto.response.DonutChartResponseDto;
 import dto.response.RecordResponseDto;
 import dto.response.StatusResponseDto;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -64,4 +66,5 @@ public class AttentionController {
     public StatusResponseDto getRecentStatus(@PathVariable("attentionId") Long attentionId) {
         return attentionService.getFiveMinutesPrediction(attentionId);
     }
+
 }

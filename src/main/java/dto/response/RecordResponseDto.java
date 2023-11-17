@@ -10,10 +10,13 @@ public class RecordResponseDto {
 
     private String totalTime;
     private String attentionTime;
+    private AttentionTimeSlotResponseDto attentionTimeSlots;
 
-    public RecordResponseDto(Duration totalTime, Duration attentionTime) {
+    public RecordResponseDto(Duration totalTime, Duration attentionTime, AttentionTimeSlotResponseDto attentionTimeSlots
+        ) {
         this.totalTime = formatTime(totalTime);
         this.attentionTime = formatTime(attentionTime);
+        this.attentionTimeSlots = attentionTimeSlots;
     }
 
     private String formatTime(Duration duration) {
