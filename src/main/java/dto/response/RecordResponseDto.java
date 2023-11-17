@@ -1,10 +1,6 @@
 package dto.response;
 
-import com.pacemaker.eta.domain.entity.Attention;
 import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,14 +9,10 @@ import lombok.NoArgsConstructor;
 public class RecordResponseDto {
 
     private String totalTime;
-    private int distractionCount;
-    private int attentionCount;
     private String attentionTime;
 
-    public RecordResponseDto(Duration totalTime, int distractionCount, int attentionCount, Duration attentionTime) {
+    public RecordResponseDto(Duration totalTime, Duration attentionTime) {
         this.totalTime = formatTime(totalTime);
-        this.distractionCount = distractionCount;
-        this.attentionCount = attentionCount;
         this.attentionTime = formatTime(attentionTime);
     }
 

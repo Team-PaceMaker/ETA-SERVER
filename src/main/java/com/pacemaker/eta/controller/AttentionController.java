@@ -3,6 +3,7 @@ package com.pacemaker.eta.controller;
 import com.pacemaker.eta.service.AttentionService;
 import dto.response.AttentionOutResponseDto;
 import dto.response.AttentionResponseDto;
+import dto.response.DonutChartResponseDto;
 import dto.response.RecordResponseDto;
 import dto.response.StatusResponseDto;
 import java.time.LocalDateTime;
@@ -41,7 +42,8 @@ public class AttentionController {
     }
 
     @PostMapping("/out/{attentionId}")
-    public ResponseEntity<AttentionOutResponseDto> getTerminated(@PathVariable("attentionId") Long attentionId) {
+    public ResponseEntity<AttentionOutResponseDto> getTerminated(
+        @PathVariable("attentionId") Long attentionId) {
         LocalDateTime stopAt = LocalDateTime.now();
         AttentionOutResponseDto responseDto = attentionService.stopAttention(attentionId, stopAt);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(responseDto);
@@ -51,6 +53,11 @@ public class AttentionController {
     public RecordResponseDto getRecord(
         @PathVariable("attentionId") Long attentionId) {
         return attentionService.getRecord(attentionId);
+    }
+
+    @GetMapping("/record/count/{attentionId}")
+    public DonutChartResponseDto getAttentionCount(@PathVariable("attentionId") Long attentionID) {
+        return attentionService.getAttentionCount(attentionID);
     }
 
 }

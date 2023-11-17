@@ -7,6 +7,7 @@ import com.pacemaker.eta.domain.entity.Status;
 import com.pacemaker.eta.repository.AttentionJpaRepository;
 import com.pacemaker.eta.repository.StatusJpaRepository;
 import dto.response.AttentionOutResponseDto;
+import dto.response.DonutChartResponseDto;
 import dto.response.RecordResponseDto;
 import dto.response.StatusResponseDto;
 import java.time.Duration;
@@ -53,18 +54,22 @@ public class AttentionService {
         return AttentionOutResponseDto.of(attention);
     }
 
+    public DonutChartResponseDto getAttentionCount(Long attentionId) {
+        int[] attentionOrNot = getStatusCount(attentionId);
+        int distractionCnt = attentionOrNot[0];
+        int attentionCnt = attentionOrNot[1];
+        return new DonutChartResponseDto(distractionCnt, attentionCnt);
+    }
+
     public RecordResponseDto getRecord(Long attentionId) {
         Attention attention = attentionJpaRepository.findById(attentionId)
             .orElseThrow(() -> new EntityNotFoundException("해당하는 집중 ID를 찾을 수 없습니다."));
         Duration interval = getTotalTime(attention.getCreatedAt(), attention.getStopAt());
-        int[] attentionOrNot = getStatusCount(attentionId);
-        int distractionCount = attentionOrNot[0];
-        int attentionCount = attentionOrNot[1];
 
         List<LocalDateTime> attentionTimeList = getAttentionTimeList(attentionId);
         Duration attentionDuration = getAttentionTime(attentionTimeList);
 
-        return new RecordResponseDto(interval, distractionCount, attentionCount, attentionDuration);
+        return new RecordResponseDto(interval, attentionDuration);
     }
 
     private Duration getTotalTime(LocalDateTime startAt, LocalDateTime stopAt) {
