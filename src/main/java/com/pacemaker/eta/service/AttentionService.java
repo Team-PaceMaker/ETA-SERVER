@@ -64,7 +64,6 @@ public class AttentionService {
         List<LocalDateTime> attentionTimeList = getAttentionTimeList(attentionId);
         Duration attentionDuration = getAttentionTime(attentionTimeList);
 
-
         return new RecordResponseDto(interval, distractionCount, attentionCount, attentionDuration);
     }
 
@@ -93,7 +92,7 @@ public class AttentionService {
 
     private int getPrediction(String responseBody) {
         int prediction;
-        if(responseBody.contains("0")) {
+        if (responseBody.contains("0")) {
             prediction = DISTRACTION_STATUS;
             return prediction;
         }
@@ -105,14 +104,12 @@ public class AttentionService {
     }
 
     @Transactional
-    public String createStatus(int prediction,  Long attentionId) {
-        Attention attention = attentionJpaRepository.findById(attentionId)
-            .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 attention_id: " + attentionId));
-        Status status = statusJpaRepository.save(Status.builder()
-                .currentStatus(prediction)
-                .capturedAt(LocalDateTime.now())
-                .attention(attention)
-                .build());
+    public String createStatus(int prediction, Long attentionId) {
+        Attention attention = attentionJpaRepository.findById(attentionId).orElseThrow(
+            () -> new IllegalArgumentException("유효하지 않은 attention_id: " + attentionId));
+        Status status = statusJpaRepository.save(
+            Status.builder().currentStatus(prediction).capturedAt(LocalDateTime.now())
+                .attention(attention).build());
         return status.getStatusId().toString();
     }
 
@@ -128,7 +125,8 @@ public class AttentionService {
 
         HttpEntity<?> requestMessage = new HttpEntity<>(body, httpHeaders);
 
-        HttpEntity<String> response = restTemplate.postForEntity(ATTENTION_MODEL_URL, requestMessage, String.class);
+        HttpEntity<String> response = restTemplate.postForEntity(ATTENTION_MODEL_URL,
+            requestMessage, String.class);
 
         handlePrediction(Objects.requireNonNull(response.getBody()), attentionId);
 
@@ -150,7 +148,7 @@ public class AttentionService {
     }
 
     private Duration getAttentionTime(List<LocalDateTime> attentionList) {
-        long totalSeconds =attentionList.size();
+        long totalSeconds = attentionList.size();
         return Duration.ofSeconds(totalSeconds);
     }
 

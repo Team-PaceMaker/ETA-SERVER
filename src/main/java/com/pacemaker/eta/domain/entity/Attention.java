@@ -4,10 +4,17 @@ import com.pacemaker.eta.domain.global.BaseTimeEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -16,7 +23,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "attention")
 @EntityListeners(AuditingEntityListener.class)
 public class Attention extends BaseTimeEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "attention_id")
     private Long attentionId;
 
@@ -25,6 +34,7 @@ public class Attention extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "attention", cascade = CascadeType.ALL)
     private List<Status> statusList = new ArrayList<>();
+
     public void setStopAt(LocalDateTime stopAt) {
         this.stopAt = stopAt;
     }
