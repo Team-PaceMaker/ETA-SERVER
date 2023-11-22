@@ -35,7 +35,6 @@ public class AttentionController {
         @RequestParam Long attentionId) throws Exception {
         return ResponseEntity.ok(attentionService.getStatus(file, attentionId));
     }
-
     @PostMapping("/in")
     public ResponseEntity<AttentionResponseDto> createAttention() {
         Long createdAttentionId = attentionService.createAttention();

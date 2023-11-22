@@ -42,7 +42,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional(readOnly = true)
 public class AttentionService {
 
-    private static final String ATTENTION_MODEL_URL = "http://eta-model.kro.kr:5000/api/v1/eta/attention";
+    private static final String ATTENTION_MODEL_URL = "http://eta-model.kro.kr:5001/api/v1/eta/attention";
     private static final int ATTENTION_STATUS = 1;
     private static final int DISTRACTION_STATUS = 0;
 
