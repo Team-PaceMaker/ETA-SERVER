@@ -1,12 +1,19 @@
 spring:
-  profiles:
-    include: SECRET-KEY
-
   datasource:
-    url: jdbc:mysql://${database-host}/etadb
+    url: jdbc:mysql://${DATABASE_HOST}/etadb
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: admin
-    password: ${database-password}
+    password: ${DATABASE_PASSWORD}
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${CLIENT_ID}
+            client-secret: ${CLIENT_SECRET}
+            scope:
+              - email
 
   jpa:
     database: mysql

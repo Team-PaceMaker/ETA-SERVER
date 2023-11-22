@@ -45,4 +45,6 @@ out/
 
 application-SECRET-KEY.properties
 
+.env
+
 
