@@ -5,24 +5,45 @@ spring:
     username: admin
     password: ${DATABASE_PASSWORD}
 
+  redis:
+    port: 6379
+    host: localhost
+
   security:
     oauth2:
       client:
         registration:
+          # google은 oauth2 자체에서 provider 내용이 포함
           google:
             client-id: ${CLIENT_ID}
             client-secret: ${CLIENT_SECRET}
             scope:
               - email
+            redirect-uri: ${REDIRECT_URI}
 
   jpa:
     database: mysql
     properties:
       hibernate:
-        ddl-auto: create
+        ddl-auto: none
         dialect: org.hibernate.dialect.MySQL5Dialect
         format_sql: true
     generate-ddl: true
 
+security:
+  jwt:
+    token:
+      secret-key: ${JWT_SECRET}
+      expire-length: 1800000
+  refresh:
+    token:
+      expire-day: 1
+
+---
+
 server:
-  port: 8085
+  port: 8888
+
+cors:
+  allowed:
+    origins: http://localhost:8888

@@ -14,23 +14,31 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Table(name = "member")
 public class Member extends BaseTimeEntity {
-    @Builder
-    public Member(Long id, String name, String email) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-    }
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
-
-    @Column(length = 50, nullable = false)
+    @Column(length = 50, nullable = false, unique = true)
     private String name;
 
-    @Column(length = 30, nullable = false)
+    @Column(length = 30, nullable = false, unique = true)
     private String email;
+
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole;
+
+    private String refreshToken;
+
+    private String pictureUrl;
+
+    private String registrationId;
+
+    @Builder
+    public Member(String name, String email, String pictureUrl, String registrationId) {
+        this.name = name;
+        this.email = email;
+        this.pictureUrl = pictureUrl;
+        this.registrationId = registrationId;
+    }
+
 }
