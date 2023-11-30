@@ -1,5 +1,7 @@
 package com.pacemaker.eta.global.config.security;
 
+import com.pacemaker.eta.jwt.JwtFilter;
+import com.pacemaker.eta.jwt.TokenProvider;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

@@ -44,14 +44,8 @@ spring:
         format_sql: true
     generate-ddl: true
 
-security:
-  jwt:
-    token:
-      secret-key: ${JWT_SECRET}
-      expire-length: 1800000
-  refresh:
-    token:
-      expire-day: 1
+jwt:
+  secret: ${JWT_SECRET}
 
 ---
 
