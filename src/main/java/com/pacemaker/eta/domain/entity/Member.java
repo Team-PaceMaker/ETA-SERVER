@@ -29,16 +29,16 @@ public class Member extends BaseTimeEntity {
 
     private String refreshToken;
 
-    private String pictureUrl;
-
-    private String registrationId;
+    // private String registrationId;
 
     @Builder
-    public Member(String name, String email, String pictureUrl, String registrationId) {
+    public Member(String name, String email) {
         this.name = name;
         this.email = email;
-        this.pictureUrl = pictureUrl;
-        this.registrationId = registrationId;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
 }

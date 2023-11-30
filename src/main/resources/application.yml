@@ -13,13 +13,27 @@ spring:
     oauth2:
       client:
         registration:
-          # google은 oauth2 자체에서 provider 내용이 포함
           google:
             client-id: ${CLIENT_ID}
             client-secret: ${CLIENT_SECRET}
             scope:
               - email
             redirect-uri: ${REDIRECT_URI}
+
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            client-name: kakao
+            client-authentication-method: client_secret_post
+            redirect-uri: ${KAKAO_REDIRECT_URI}
+            authorization-grant-type: authorization_code
+            scope: profile_nickname
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
 
   jpa:
     database: mysql
@@ -42,7 +56,7 @@ security:
 ---
 
 server:
-  port: 8888
+  port: 8085
 
 cors:
   allowed:

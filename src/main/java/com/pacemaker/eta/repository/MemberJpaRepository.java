@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 public interface MemberJpaRepository extends JpaRepository<Member, Long> {
 
     // from. https://europani.github.io/spring/2022/01/15/036-oauth2-jwt.html
-    Optional<Member> findByEmail(String email);
+    Member findByEmail(String email);
 
     boolean existsByEmail(String email);
 
