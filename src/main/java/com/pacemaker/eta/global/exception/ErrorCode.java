@@ -10,7 +10,9 @@ public enum ErrorCode {
     NOT_FOUND_REFRESH_TOKEN_IN_REPOSITORY(2002, 401, "리프레시 토큰 저장소에 존재하지 않는 리프레시 토큰입니다."),
     EXPIRED_REFRESH_TOKEN(2003, 401, "리프레시 토큰이 만료되었습니다"),
     AUTHORIZATION_FAIL(2004, 401, "엑세스 토큰이 존재하지 않거나 만료되었습니다."),
-    NOT_FOUND_AUTHORITY(2005, 401, "권한이 없는 사용자입니다.")
+    NOT_FOUND_AUTHORITY(2005, 401, "권한이 없는 사용자입니다."),
+    NOT_FOUND_USER(2006, 401, "찾을 수 없는 사용자입니다."),
+    LOGOUT_USER(2007, 401, "로그아웃 한 유저입니다.")
     ;
 
     private final int value;

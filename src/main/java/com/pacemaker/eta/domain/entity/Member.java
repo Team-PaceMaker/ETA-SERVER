@@ -2,6 +2,8 @@ package com.pacemaker.eta.domain.entity;
 
 import com.pacemaker.eta.domain.global.BaseTimeEntity;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,24 +23,34 @@ public class Member extends BaseTimeEntity {
     @Column(length = 50, nullable = false, unique = true)
     private String name;
 
-    @Column(length = 30, nullable = false, unique = true)
-    private String email;
+    @Column(nullable = false)
+    private Long kakaoId;
+
+    private String accessToken;
 
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    @Enumerated(EnumType.STRING)
+    private UserRole authority;
+
     private String refreshToken;
 
-    // private String registrationId;
-
     @Builder
-    public Member(String name, String email) {
+    public Member(String name, Long kakaoId) {
         this.name = name;
-        this.email = email;
+        this.kakaoId = kakaoId;
     }
 
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
+    public Set<UserRole> getAuthorities(){
+        Set<UserRole> returnRole = new HashSet<>();
+        returnRole.add(this.authority);
+        return returnRole;
     }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
 
 }

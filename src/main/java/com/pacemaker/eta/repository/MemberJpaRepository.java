@@ -11,9 +11,9 @@ import org.springframework.data.repository.query.Param;
 public interface MemberJpaRepository extends JpaRepository<Member, Long> {
 
     // from. https://europani.github.io/spring/2022/01/15/036-oauth2-jwt.html
-    Member findByEmail(String email);
+    Optional<Member> findByKakaoId(Long kakaoId);
 
-    boolean existsByEmail(String email);
+    Member findByAccessToken(String accessToken);
 
     @Query("SELECT m.refreshToken FROM Member m WHERE m.id=:id")
     String getRefreshTokenById(@Param("id") Long id);
