@@ -178,7 +178,7 @@ public class AttentionService {
     }
 
     private Duration getAttentionTime(List<LocalDateTime> attentionList) {
-        long totalSeconds = attentionList.size();
+        long totalSeconds = 2L * (attentionList.size()); // 2초당 attention 하나
         return Duration.ofSeconds(totalSeconds);
     }
 
