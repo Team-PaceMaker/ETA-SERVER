@@ -1,6 +1,7 @@
 package com.pacemaker.eta.controller;
 
 import com.pacemaker.eta.service.AttentionService;
+import com.pacemaker.eta.service.AuthService;
 import dto.response.AttentionOutResponseDto;
 import dto.response.AttentionResponseDto;
 import dto.response.AttentionTimeSlotResponseDto;
@@ -14,6 +15,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,13 +33,15 @@ public class AttentionController {
     private final AttentionService attentionService;
 
     @PostMapping
-    public ResponseEntity<StatusResponseDto> getStatus(@RequestParam("image") MultipartFile file,
+    public ResponseEntity<StatusResponseDto> getStatus(
+        @RequestParam("image") MultipartFile file,
         @RequestParam Long attentionId) throws Exception {
+
         return ResponseEntity.ok(attentionService.getStatus(file, attentionId));
     }
     @PostMapping("/in")
-    public ResponseEntity<AttentionResponseDto> createAttention() {
-        Long createdAttentionId = attentionService.createAttention();
+    public ResponseEntity<AttentionResponseDto> createAttention(final Authentication authentication) {
+        Long createdAttentionId = attentionService.createAttention(authentication);
         AttentionResponseDto responseBody = new AttentionResponseDto(createdAttentionId);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }

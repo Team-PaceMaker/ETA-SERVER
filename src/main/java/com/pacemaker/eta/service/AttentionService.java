@@ -3,8 +3,10 @@ package com.pacemaker.eta.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pacemaker.eta.domain.entity.Attention;
+import com.pacemaker.eta.domain.entity.Member;
 import com.pacemaker.eta.domain.entity.Status;
 import com.pacemaker.eta.repository.AttentionJpaRepository;
+import com.pacemaker.eta.repository.MemberJpaRepository;
 import com.pacemaker.eta.repository.StatusJpaRepository;
 import dto.response.AttentionOutResponseDto;
 import dto.response.AttentionTimeSlotResponseDto;
@@ -30,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -48,10 +51,14 @@ public class AttentionService {
 
     private final AttentionJpaRepository attentionJpaRepository;
     private final StatusJpaRepository statusJpaRepository;
+    private final MemberJpaRepository memberJpaRepository;
 
     @Transactional
-    public Long createAttention() {
-        Attention attention = new Attention();
+    public Long createAttention(Authentication authentication) {
+        long userKakaoId = Long.parseLong(authentication.getName());
+        Member member = memberJpaRepository.findByKakaoIdOrThrow(userKakaoId);
+        Attention attention = Attention.builder()
+            .member(member).build();
         attentionJpaRepository.save(attention);
         return attention.getAttentionId();
     }
@@ -136,6 +143,7 @@ public class AttentionService {
 
     @Transactional
     public StatusResponseDto getStatus(MultipartFile file, Long attentionId) throws Exception {
+
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders httpHeaders = new HttpHeaders();

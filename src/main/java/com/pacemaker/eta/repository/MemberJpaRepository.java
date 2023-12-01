@@ -1,6 +1,8 @@
 package com.pacemaker.eta.repository;
 
 import com.pacemaker.eta.domain.entity.Member;
+import com.pacemaker.eta.global.exception.BusinessException;
+import com.pacemaker.eta.global.exception.ErrorCode;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,14 +14,11 @@ public interface MemberJpaRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByKakaoId(Long kakaoId);
 
+    default Member findByKakaoIdOrThrow(Long id) {
+        return findByKakaoId(id).orElseThrow(
+            () -> BusinessException.from(ErrorCode.NOT_FOUND_USER));
+    }
+
     Member findByAccessToken(String accessToken);
-
-    @Query("SELECT m.refreshToken FROM Member m WHERE m.id=:id")
-    String getRefreshTokenById(@Param("id") Long id);
-
-    @Transactional
-    @Modifying
-    @Query("UPDATE Member m SET m.refreshToken=:token WHERE m.id=:id")
-    void updateRefreshToken(@Param("id") Long id, @Param("token") String token);
 
 }
