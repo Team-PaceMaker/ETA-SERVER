@@ -24,7 +24,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
-        if(request.getServletPath().startsWith("/api/v1/kakao/login")) {
+        if(request.getServletPath().startsWith("/api/v1/auth/kakao/login")) {
             filterChain.doFilter(request,response);
         }
         else {
@@ -35,34 +35,29 @@ public class JwtFilter extends OncePerRequestFilter {
                 int flag = tokenProvider.validateToken(token);
 
                 log.debug("flag = {}",flag);
-                // 토큰 유효함
+
                 if(flag == 1) {
                     this.setAuthentication(token);
                 }else if(flag == 2) { // 토큰 만료
                     response.setContentType("application/json");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setCharacterEncoding("UTF-8");
-//                    PrintWriter out = response.getWriter(); // 첫 호출
                     log.debug("doFilterInternal Exception CALL!");
                     log.info("{\"error\": \"ACCESS_TOKEN_EXPIRED\", \"message\" : \"엑세스토큰이 만료되었습니다.\"}");
-                } else { //잘못된 토큰
+                } else {
                     response.setContentType("application/json");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setCharacterEncoding("UTF-8");
-//                    PrintWriter out = response.getWriter();
                     log.debug("doFilterInternal Exception CALL!");
                     log.debug("{\"error\": \"BAD_TOKEN\", \"message\" : \"잘못된 토큰 값입니다.\"}");
-//                    out.flush(); // 응답 데이터 전송
                 }
             }
             else {
                 response.setContentType("application/json");
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.setCharacterEncoding("UTF-8");
-//                PrintWriter out = response.getWriter();
                 log.debug("doFilterInternal Exception CALL!");
                 log.debug("{\"error\": \"EMPTY_TOKEN\", \"message\" : \"토큰 값이 비어있습니다.\"}");
-//                out.flush(); // 응답 데이터 전송
             }
             filterChain.doFilter(request, response);
 
@@ -73,13 +68,12 @@ public class JwtFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    // Request Header 에서 토큰 정보를 꺼내오기
     private String resolveToken(HttpServletRequest request) {
-        // bearer : 123123123123123 -> return 123123123123123123
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return bearerToken.substring(7);
         }
         return null;
     }
+
 }

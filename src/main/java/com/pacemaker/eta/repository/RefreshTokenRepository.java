@@ -22,7 +22,6 @@ public class RefreshTokenRepository {
     //Delete 함수 구현
     @Transactional
     public void deleteRefreshToken(RefreshToken refreshToken){
-        log.info("hi");
         log.info(refreshToken.getValue());
         em.remove(refreshToken);
     }

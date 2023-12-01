@@ -29,17 +29,15 @@ public class Member extends BaseTimeEntity {
     private String accessToken;
 
     @Enumerated(EnumType.STRING)
-    private UserRole userRole;
-
-    @Enumerated(EnumType.STRING)
     private UserRole authority;
 
     private String refreshToken;
 
     @Builder
-    public Member(String name, Long kakaoId) {
+    public Member(String name, Long kakaoId, UserRole authority) {
         this.name = name;
         this.kakaoId = kakaoId;
+        this.authority = authority;
     }
 
     public Set<UserRole> getAuthorities(){
