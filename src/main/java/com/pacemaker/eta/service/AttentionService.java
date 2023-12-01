@@ -10,10 +10,12 @@ import com.pacemaker.eta.repository.MemberJpaRepository;
 import com.pacemaker.eta.repository.StatusJpaRepository;
 import dto.response.AttentionOutResponseDto;
 import dto.response.AttentionTimeSlotResponseDto;
+import dto.response.DayAttentionResponse;
 import dto.response.DonutChartResponseDto;
 import dto.response.RecordResponseDto;
 import dto.response.StatusResponseDto;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -254,6 +256,25 @@ public class AttentionService {
 
     private String formatSlot(int startHour, int endHour) {
         return startHour + "-" + (endHour+1);
+    }
+
+    public List<DayAttentionResponse> getOneDayAttentionTime(Authentication authentication) {
+        long dayTotalAttentionTime = 0L;
+        long userKakaoId = Long.parseLong(authentication.getName());
+        Member member = memberJpaRepository.findByKakaoIdOrThrow(userKakaoId);
+        List<Attention> attentions = attentionJpaRepository.findAllByMember(member.getId());
+
+        List<DayAttentionResponse> dayAttentionResponses = new ArrayList<>();
+
+        for (Attention single : attentions) {
+            List<LocalDateTime> attentionTimes = getAttentionTimeList(single.getAttentionId());
+            dayTotalAttentionTime = attentionTimes.stream()
+                .mapToLong(time -> getAttentionTime(List.of(time)).toHours())
+                .sum();
+            dayAttentionResponses.add(DayAttentionResponse.of(single.getCreatedAt().toLocalDate(), dayTotalAttentionTime));
+        }
+
+        return dayAttentionResponses;
     }
 
 }

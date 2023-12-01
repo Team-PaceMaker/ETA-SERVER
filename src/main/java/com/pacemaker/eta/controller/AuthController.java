@@ -2,7 +2,8 @@ package com.pacemaker.eta.controller;
 
 import com.pacemaker.eta.jwt.TokenDto;
 import com.pacemaker.eta.service.AuthService;
-import dto.request.KakaoLoginRequestDto;
+import dto.request.AuthCodeRequest;
+import dto.request.AuthCodeRequest;
 import dto.response.KakaoUserInfo;
 import dto.response.MemberResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +22,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public TokenDto kakaoLogin(@RequestParam String authCode) {
-        KakaoUserInfo kakaoUserInfo = authService.login(authCode);
+    public TokenDto kakaoLogin(@RequestBody AuthCodeRequest authCodeRequest) {
+        KakaoUserInfo kakaoUserInfo = authService.login(authCodeRequest);
         return authService.createToken(kakaoUserInfo);
-
     }
 
     @PostMapping("/logout")

@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class KakaoLoginRequestDto {
+public class AuthCodeRequest {
     @NotBlank
     private String authCode;
 }
