@@ -48,6 +48,7 @@ public class AttentionService {
     private static final String ATTENTION_MODEL_URL = "http://eta-model.kro.kr:5001/api/v1/eta/attention";
     private static final int ATTENTION_STATUS = 1;
     private static final int DISTRACTION_STATUS = 0;
+    private static final int CAPTURE_INTERVAL = 2;
 
     private final AttentionJpaRepository attentionJpaRepository;
     private final StatusJpaRepository statusJpaRepository;
@@ -178,7 +179,9 @@ public class AttentionService {
     }
 
     private Duration getAttentionTime(List<LocalDateTime> attentionList) {
-        long totalSeconds = 2L * (attentionList.size()); // 2초당 attention 하나
+        int totalSeconds = 2 * (attentionList.size()); // 2초당 attention 하나
+        System.out.println(totalSeconds);
+
         return Duration.ofSeconds(totalSeconds);
     }
 
