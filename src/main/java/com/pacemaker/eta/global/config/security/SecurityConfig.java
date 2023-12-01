@@ -50,10 +50,10 @@ public class SecurityConfig {
             .and()
 
             .formLogin().disable()
-            .httpBasic().disable()
+            .httpBasic().disable();
 
-            .authorizeHttpRequests()
-            .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+//            .authorizeHttpRequests()
+//            .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
 
         return httpSecurity.build();
     }
