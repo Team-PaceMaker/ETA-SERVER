@@ -31,8 +31,6 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private UserRole authority;
 
-    private String refreshToken;
-
     @Builder
     public Member(String name, Long kakaoId, UserRole authority) {
         this.name = name;
