@@ -9,17 +9,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DayAttentionResponse {
     LocalDate date;
-    String attentionTime;
+    Long attentionTime;
 
     public DayAttentionResponse(LocalDate date, Duration attentionTime) {
         this.date = date;
         this.attentionTime = formatTime(attentionTime);
     }
 
-    private static String formatTime(Duration duration) {
-        long seconds = duration.getSeconds();
-
-        return String.format("%d", seconds);
+    private static Long formatTime(Duration duration) {
+        return duration.getSeconds();
     }
 
 }
