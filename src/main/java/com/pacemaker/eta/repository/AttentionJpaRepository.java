@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AttentionJpaRepository extends JpaRepository<Attention, Long> {
 
-    List<Attention> findAllByMember(Long memberId);
+    List<Attention> findAllByMemberId(Long memberId);
 
 }

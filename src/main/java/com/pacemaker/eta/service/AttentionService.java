@@ -31,6 +31,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -45,6 +46,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class AttentionService {
 
     private static final String ATTENTION_MODEL_URL = "http://eta-model.kro.kr:5001/api/v1/eta/attention";
@@ -182,7 +184,6 @@ public class AttentionService {
 
     private Duration getAttentionTime(List<LocalDateTime> attentionList) {
         int totalSeconds = 2 * (attentionList.size()); // 2초당 attention 하나
-        System.out.println(totalSeconds);
 
         return Duration.ofSeconds(totalSeconds);
     }
@@ -198,6 +199,34 @@ public class AttentionService {
             Duration interval = Duration.between(status.getCapturedAt(), currentTime);
             LocalDateTime statusTime = status.getCapturedAt();
             if (interval.getSeconds() <= 300 && statusTime.isAfter(fiveMinutesAgo)
+                && status.getCapturedAt()
+                .isBefore(currentTime)) {
+                if (status.getCurrentStatus() == 1) {
+                    attentions++;
+                } else {
+                    distractions++;
+                }
+            }
+        }
+
+        if (attentions >= distractions) {
+            return new StatusResponseDto(ATTENTION_STATUS);
+        } else {
+            return new StatusResponseDto(DISTRACTION_STATUS);
+        }
+    }
+
+    public StatusResponseDto getThreeMinutesPrediction (Long attentionId) {
+        int attentions = 0;
+        int distractions = 0;
+
+        List<Status> statusGroup = statusJpaRepository.findAllByAttention_attentionId(attentionId);
+        LocalDateTime currentTime = LocalDateTime.now();
+        LocalDateTime thirtyMinutesAgo = currentTime.minusMinutes(3);
+        for (Status status : statusGroup) {
+            Duration interval = Duration.between(status.getCapturedAt(), currentTime);
+            LocalDateTime statusTime = status.getCapturedAt();
+            if (interval.getSeconds() <= 180 && statusTime.isAfter(thirtyMinutesAgo)
                 && status.getCapturedAt()
                 .isBefore(currentTime)) {
                 if (status.getCurrentStatus() == 1) {
@@ -258,23 +287,35 @@ public class AttentionService {
         return startHour + "-" + (endHour+1);
     }
 
-    public List<DayAttentionResponse> getOneDayAttentionTime(Authentication authentication) {
-        long dayTotalAttentionTime = 0L;
-        long userKakaoId = Long.parseLong(authentication.getName());
-        Member member = memberJpaRepository.findByKakaoIdOrThrow(userKakaoId);
-        List<Attention> attentions = attentionJpaRepository.findAllByMember(member.getId());
-
+    public List<DayAttentionResponse> getSevenDaysAttentionTime(Authentication authentication) {
+        Member member = getMemberFromAuth(authentication);
+        List<Attention> attentions = attentionJpaRepository.findAllByMemberId(member.getId());
         List<DayAttentionResponse> dayAttentionResponses = new ArrayList<>();
+        LocalDate today = LocalDate.now();
 
-        for (Attention single : attentions) {
-            List<LocalDateTime> attentionTimes = getAttentionTimeList(single.getAttentionId());
-            dayTotalAttentionTime = attentionTimes.stream()
-                .mapToLong(time -> getAttentionTime(List.of(time)).toHours())
-                .sum();
-            dayAttentionResponses.add(DayAttentionResponse.of(single.getCreatedAt().toLocalDate(), dayTotalAttentionTime));
+        for (int i = 1; i <= 7; i++) {
+            Duration dayTotal = Duration.ZERO;
+            LocalDate previous = today.minusDays(i);
+
+            DayAttentionResponse dayAttentionResponse = new DayAttentionResponse();
+            dayAttentionResponse.setDate(previous);
+
+            for (Attention attention : attentions) {
+                if (previous.equals(attention.getCreatedAt().toLocalDate())) {
+                    Duration attentionTime = getAttentionTime(getAttentionTimeList(attention.getAttentionId()));
+                    dayTotal = dayTotal.plus(attentionTime);
+                }
+            }
+
+            dayAttentionResponses.add(new DayAttentionResponse(previous, dayTotal));
         }
 
         return dayAttentionResponses;
+    }
+
+    private Member getMemberFromAuth(Authentication authentication) {
+        long userKakaoId = Long.parseLong(authentication.getName());
+        return memberJpaRepository.findByKakaoIdOrThrow(userKakaoId);
     }
 
 }
