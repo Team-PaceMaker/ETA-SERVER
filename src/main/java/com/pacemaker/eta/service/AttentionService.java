@@ -287,11 +287,19 @@ public class AttentionService {
         return startHour + "-" + (endHour+1);
     }
 
-    public List<DayAttentionResponse> getSevenDaysAttentionTime(Authentication authentication) {
+    public List<DayAttentionResponse> getSevenDaysAttentionTime(Authentication authentication, int week) {
         Member member = getMemberFromAuth(authentication);
         List<Attention> attentions = attentionJpaRepository.findAllByMemberId(member.getId());
         List<DayAttentionResponse> dayAttentionResponses = new ArrayList<>();
         LocalDate today = LocalDate.now();
+
+        if (week == 2) {
+            today = today.minusWeeks(1);
+        }
+
+        if (week == 3) {
+            today = today.minusWeeks(2);
+        }
 
         for (int i = 1; i <= 7; i++) {
             Duration dayTotal = Duration.ZERO;

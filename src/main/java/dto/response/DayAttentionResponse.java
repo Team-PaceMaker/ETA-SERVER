@@ -17,11 +17,9 @@ public class DayAttentionResponse {
     }
 
     private static String formatTime(Duration duration) {
-        long hours = duration.toHours();
-        long minutes = duration.minusHours(hours).toMinutes();
-        long seconds = duration.minusHours(hours).minusMinutes(minutes).getSeconds();
+        long seconds = duration.getSeconds();
 
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        return String.format("%d", seconds);
     }
 
 }
