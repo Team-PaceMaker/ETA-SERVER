@@ -301,7 +301,7 @@ public class AttentionService {
             today = today.minusWeeks(2);
         }
 
-        for (int i = 1; i <= 7; i++) {
+        for (int i = 0; i < 7; i++) {
             Duration dayTotal = Duration.ZERO;
             LocalDate previous = today.minusDays(i);
 
