@@ -304,7 +304,8 @@ public class AttentionService {
         }
 
         for (int i = 0; i < 7; i++) {
-            Duration dayTotal = Duration.ZERO;
+            Duration dayTotalAttentionTime = Duration.ZERO;
+            Duration dayTotalUseTime = Duration.ZERO;
             LocalDate previous = today.minusDays(i);
 
             DayAttentionResponse dayAttentionResponse = new DayAttentionResponse();
@@ -313,11 +314,12 @@ public class AttentionService {
             for (Attention attention : attentions) {
                 if (previous.equals(attention.getCreatedAt().toLocalDate())) {
                     Duration attentionTime = getAttentionTime(getAttentionTimeList(attention.getAttentionId()));
-                    dayTotal = dayTotal.plus(attentionTime);
+                    dayTotalAttentionTime = dayTotalAttentionTime.plus(attentionTime);
+                    dayTotalUseTime = dayTotalUseTime.plus(getTotalTime(attention.getCreatedAt(), attention.getStopAt()));
                 }
             }
 
-            dayAttentionResponses.add(new DayAttentionResponse(previous, dayTotal));
+            dayAttentionResponses.add(new DayAttentionResponse(previous, dayTotalAttentionTime, dayTotalUseTime));
         }
 
         return dayAttentionResponses;
