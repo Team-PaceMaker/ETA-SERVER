@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pacemaker.eta.domain.entity.Attention;
 import com.pacemaker.eta.domain.entity.Member;
 import com.pacemaker.eta.domain.entity.Status;
+import com.pacemaker.eta.global.exception.BusinessException;
+import com.pacemaker.eta.global.exception.ErrorCode;
 import com.pacemaker.eta.repository.AttentionJpaRepository;
 import com.pacemaker.eta.repository.MemberJpaRepository;
 import com.pacemaker.eta.repository.StatusJpaRepository;
@@ -71,7 +73,7 @@ public class AttentionService {
     @Transactional
     public AttentionOutResponseDto stopAttention(Long attentionId, LocalDateTime stopAt) {
         Attention attention = attentionJpaRepository.findById(attentionId)
-            .orElseThrow(() -> new EntityNotFoundException(("해당하는 집중 ID를 찾을 수 없습니다.")));
+            .orElseThrow(() -> BusinessException.from(ErrorCode.NOT_FOUND_ATTENTION));
         attention.setStopAt(stopAt);
         return AttentionOutResponseDto.of(attention);
     }

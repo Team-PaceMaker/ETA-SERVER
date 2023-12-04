@@ -1,5 +1,7 @@
 package com.pacemaker.eta.controller;
 
+import com.pacemaker.eta.global.exception.BusinessException;
+import com.pacemaker.eta.global.exception.ErrorCode;
 import com.pacemaker.eta.service.AttentionService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +26,7 @@ public class DataController {
         @PathVariable(value = "week") int week,
         final Authentication authentication) {
         if (week < 1 || week > 3) {
-            return ResponseEntity.badRequest().body("Error: 최근 1~3주까지 조회 가능");
+            throw BusinessException.from(ErrorCode.INVALID_WEEK);
         }
 
         return ResponseEntity.ok(attentionService.getSevenDaysAttentionTime(authentication, week));

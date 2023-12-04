@@ -13,7 +13,10 @@ public enum ErrorCode {
     AUTHORIZATION_FAIL(2004, 401, "엑세스 토큰이 존재하지 않거나 만료되었습니다."),
     NOT_FOUND_AUTHORITY(2005, 401, "권한이 없는 사용자입니다."),
     NOT_FOUND_USER(2006, 401, "찾을 수 없는 사용자입니다."),
-    LOGOUT_USER(2007, 401, "로그아웃 한 유저입니다.")
+    LOGOUT_USER(2007, 401, "로그아웃 한 유저입니다."),
+
+    INVALID_WEEK(3001, 401, "1~3주차까지 조회가 가능합니다."),
+    NOT_FOUND_ATTENTION(3002, 401, "해당 id의 집중을 찾을 수 없습니다.")
     ;
 
     private final int value;
