@@ -1,5 +1,8 @@
 package com.pacemaker.eta.jwt;
 
+import com.pacemaker.eta.global.exception.BusinessException;
+import com.pacemaker.eta.global.exception.ErrorCode;
+import com.pacemaker.eta.global.exception.ExceptionHandlerFilter;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -42,14 +45,15 @@ public class JwtFilter extends OncePerRequestFilter {
                     response.setContentType("application/json");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setCharacterEncoding("UTF-8");
-                    log.debug("doFilterInternal Exception CALL!");
                     log.info("{\"error\": \"ACCESS_TOKEN_EXPIRED\", \"message\" : \"엑세스토큰이 만료되었습니다.\"}");
+                    throw BusinessException.from(ErrorCode.AUTHORIZATION_FAIL);
                 } else {
                     response.setContentType("application/json");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setCharacterEncoding("UTF-8");
                     log.debug("doFilterInternal Exception CALL!");
                     log.debug("{\"error\": \"BAD_TOKEN\", \"message\" : \"잘못된 토큰 값입니다.\"}");
+                    throw BusinessException.from(ErrorCode.INVALID_TOKEN);
                 }
             }
             else {

@@ -8,6 +8,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
@@ -72,7 +73,6 @@ public class TokenProvider {
 
     public Authentication getAuthenticationByKakaoId(String accessToken) throws BusinessException {
 
-        // 토큰 복호화
         Claims claims = parseClaims(accessToken);
 
         if (claims.get(AUTHORITIES_KEY) == null || !StringUtils.hasText(claims.get(AUTHORITIES_KEY).toString())) {
@@ -82,7 +82,6 @@ public class TokenProvider {
         log.debug("claims.getAuth = {}",claims.get(AUTHORITIES_KEY));
         log.debug("claims.getEmail = {}",claims.getSubject());
 
-        // 클레임에서 권한 정보 가져오기
         Collection<? extends GrantedAuthority> authorities =
             Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                 .map(SimpleGrantedAuthority::new)
@@ -92,7 +91,6 @@ public class TokenProvider {
             log.debug("getAuthentication -> authorities = {}",o.getAuthority());
         });
 
-        // UserDetails 객체를 만들어서 Authentication 리턴
         UserDetails principal = new User(claims.getSubject(), "", authorities);
         return new CustomKakaoIdAuthToken(principal, "", authorities);
     }
@@ -102,17 +100,15 @@ public class TokenProvider {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return 1;
         } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT 토큰입니다.");
             return 2;
-        } catch (Exception e) {
-            log.info("잘못된 토큰입니다.");
+        } catch (UnsupportedJwtException e) {
             return -1;
         }
     }
     private Claims parseClaims(String accessToken) {
         try {
             return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
-        } catch (ExpiredJwtException e) { // 만료된 토큰이 더라도 일단 파싱을 함
+        } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
     }

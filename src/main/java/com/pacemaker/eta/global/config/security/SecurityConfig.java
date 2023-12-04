@@ -1,5 +1,6 @@
 package com.pacemaker.eta.global.config.security;
 
+import com.pacemaker.eta.global.exception.ExceptionHandlerFilter;
 import com.pacemaker.eta.jwt.JwtFilter;
 import com.pacemaker.eta.jwt.TokenProvider;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.web.cors.CorsConfiguration;
@@ -41,6 +43,10 @@ public class SecurityConfig {
             .csrf().disable()
 
             .addFilterBefore(new JwtFilter(tokenProvider), LogoutFilter.class)
+            .addFilterBefore(
+                new ExceptionHandlerFilter(),
+                UsernamePasswordAuthenticationFilter.class
+            )
 
             .authorizeHttpRequests((authz) -> authz
                 .anyRequest().permitAll()
