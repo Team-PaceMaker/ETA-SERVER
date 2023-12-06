@@ -61,7 +61,7 @@ public class AttentionController {
 
     @GetMapping("/recent/{attentionId}")
     public StatusResponseDto getRecentStatus(@PathVariable("attentionId") Long attentionId) {
-        return attentionService.getThreeMinutesPrediction(attentionId);
+        return attentionService.getRecentPrediction(attentionId);
     }
 
 }

@@ -103,6 +103,9 @@ public class AttentionService {
     }
 
     private Duration getTotalTime(LocalDateTime startAt, LocalDateTime stopAt) {
+        if (stopAt == null) {
+            throw BusinessException.from(ErrorCode.NOT_ENDING_ETA);
+        }
         return Duration.between(startAt, stopAt);
     }
 
@@ -185,50 +188,22 @@ public class AttentionService {
     }
 
     private Duration getAttentionTime(List<LocalDateTime> attentionList) {
-        int totalSeconds = 2 * (attentionList.size()); // 2초당 attention 하나
+        int totalSeconds = CAPTURE_INTERVAL * (attentionList.size()); // 2초당 attention 하나
 
         return Duration.ofSeconds(totalSeconds);
     }
 
-    public StatusResponseDto getFiveMinutesPrediction(Long attentionId) {
+    public StatusResponseDto getRecentPrediction (Long attentionId) {
         int attentions = 0;
         int distractions = 0;
 
         List<Status> statusGroup = statusJpaRepository.findAllByAttention_attentionId(attentionId);
         LocalDateTime currentTime = LocalDateTime.now();
-        LocalDateTime fiveMinutesAgo = currentTime.minusMinutes(5);
+        LocalDateTime thirtyMinutesAgo = currentTime.minusSeconds(30);
         for (Status status : statusGroup) {
             Duration interval = Duration.between(status.getCapturedAt(), currentTime);
             LocalDateTime statusTime = status.getCapturedAt();
-            if (interval.getSeconds() <= 300 && statusTime.isAfter(fiveMinutesAgo)
-                && status.getCapturedAt()
-                .isBefore(currentTime)) {
-                if (status.getCurrentStatus() == 1) {
-                    attentions++;
-                } else {
-                    distractions++;
-                }
-            }
-        }
-
-        if (attentions >= distractions) {
-            return new StatusResponseDto(ATTENTION_STATUS);
-        } else {
-            return new StatusResponseDto(DISTRACTION_STATUS);
-        }
-    }
-
-    public StatusResponseDto getThreeMinutesPrediction (Long attentionId) {
-        int attentions = 0;
-        int distractions = 0;
-
-        List<Status> statusGroup = statusJpaRepository.findAllByAttention_attentionId(attentionId);
-        LocalDateTime currentTime = LocalDateTime.now();
-        LocalDateTime thirtyMinutesAgo = currentTime.minusMinutes(3);
-        for (Status status : statusGroup) {
-            Duration interval = Duration.between(status.getCapturedAt(), currentTime);
-            LocalDateTime statusTime = status.getCapturedAt();
-            if (interval.getSeconds() <= 180 && statusTime.isAfter(thirtyMinutesAgo)
+            if (interval.getSeconds() <= 30 && statusTime.isAfter(thirtyMinutesAgo)
                 && status.getCapturedAt()
                 .isBefore(currentTime)) {
                 if (status.getCurrentStatus() == 1) {

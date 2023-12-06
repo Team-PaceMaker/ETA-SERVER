@@ -17,7 +17,8 @@ public enum ErrorCode {
     INVALID_TOKEN(2008, 401, "유효하지 않은 토큰 형식입니다."),
 
     INVALID_WEEK(3001, 401, "1~3주차까지 조회가 가능합니다."),
-    NOT_FOUND_ATTENTION(3002, 401, "해당 id의 집중을 찾을 수 없습니다.")
+    NOT_FOUND_ATTENTION(3002, 401, "해당 id의 집중을 찾을 수 없습니다."),
+    NOT_ENDING_ETA(3003, 401, "아직 종료되지 않은 ETA 입니다.")
     ;
 
     private final int value;
