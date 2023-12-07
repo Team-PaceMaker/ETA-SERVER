@@ -60,8 +60,8 @@ public class AttentionController {
     }
 
     @GetMapping("/recent/{attentionId}")
-    public StatusResponseDto getRecentStatus(@PathVariable("attentionId") Long attentionId) {
-        return attentionService.getRecentPrediction(attentionId);
+    public ResponseEntity<StatusResponseDto> getRecentStatus(@PathVariable("attentionId") Long attentionId) {
+        return ResponseEntity.ok(attentionService.getRecentPrediction(attentionId));
     }
 
 }
