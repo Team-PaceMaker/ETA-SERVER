@@ -176,6 +176,12 @@ public class AttentionService {
     }
 
     private List<LocalDateTime> getAttentionTimeList(Long attentionId) {
+        Attention attention = attentionJpaRepository.findByIdOrThrow(attentionId);
+        if (attention.getStopAt() == null) {
+            attention.setStopAt(LocalDateTime.now());
+            attentionJpaRepository.save(attention);
+            throw BusinessException.from(ErrorCode.NOT_ENDING_ETA);
+        }
         List<LocalDateTime> attentionTimeList = new ArrayList<>();
         List<Status> statusList = statusJpaRepository.findAllByAttention_attentionId(attentionId);
         for (Status status : statusList) {
