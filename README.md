@@ -36,7 +36,7 @@
 4. 자체 변환한 access, refresh를 클라이언트로 전송하여 인증 및 인가를 수행한다.
 
 ### API
-[Base Url](http://eta-server.kro.kr:8085/)
+[Base Url](http://eta-server.kro.kr:8085/)<br/>
 <img width="500" alt="API 스펙" src="https://github.com/Team-PaceMaker/ETA-SERVER/assets/96538554/d3494b2e-0e54-412c-8635-d348cd40aab8">
 
 ### Design Pattern
