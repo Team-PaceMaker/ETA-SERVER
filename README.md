@@ -1,5 +1,12 @@
 # ETA Server
 
+### 실행 방법
+* * *
+```
+git clone https://github.com/Team-PaceMaker/ETA-SERVER.git
+```
+localhost:8085/api/v1/ path로 api 테스트 진행
+
 ### Environment
 * * *
 ```
